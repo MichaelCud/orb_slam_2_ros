@@ -40,6 +40,7 @@ if(NOT OpenCV_FOUND)
 endif()
 
 find_package(Eigen3 3.1.0 REQUIRED)
+find_package(Pangolin REQUIRED)
 
 set (DYNAMIC_RECONFIGURE_PATH ros/config/dynamic_reconfigure.cfg)
 execute_process(COMMAND chmod a+x ${DYNAMIC_RECONFIGURE_PATH}
@@ -55,6 +56,7 @@ generate_dynamic_reconfigure_options(
 set(LIBS_ORBSLAM
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
+${Pangolin_LIBRARIES}
 ${PROJECT_SOURCE_DIR}/orb_slam2/Thirdparty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/orb_slam2/Thirdparty/g2o/lib/libg2o.so
 )
@@ -63,6 +65,7 @@ set(LIBS_ROS
 ${PROJECT_SOURCE_DIR}/orb_slam2/lib/lib${PROJECT_NAME}.so
 ${OpenCV_LIBS}
 ${catkin_LIBRARIES}
+${Pangolin_LIBRARIES}
 )
 
 add_service_files(
@@ -86,6 +89,7 @@ ${PROJECT_SOURCE_DIR}/orb_slam2/include
 ${PROJECT_SOURCE_DIR}/ros/include
 ${EIGEN3_INCLUDE_DIR}
 ${catkin_INCLUDE_DIRS}
+${Pangolin_INCLUDE_DIRS}
 )
 
 include(${PROJECT_SOURCE_DIR}/orb_slam2/Thirdparty/DBoW2/CMakeLists.txt)
@@ -111,6 +115,9 @@ orb_slam2/src/Frame.cc
 orb_slam2/src/KeyFrameDatabase.cc
 orb_slam2/src/Sim3Solver.cc
 orb_slam2/src/Initializer.cc
+orb_slam2/src/Viewer.cc
+orb_slam2/src/MapDrawer.cc
+orb_slam2/src/ViewerAR.cc
 )
 add_dependencies (${PROJECT_NAME} g2o DBoW2)
 
@@ -126,41 +133,55 @@ if (NOT BOOST_SERIALIZATION)
 endif()
 target_link_libraries(${PROJECT_NAME} ${BOOST_SERIALIZATION})
 
-add_executable (${PROJECT_NAME}_mono
-ros/src/MonoNode.cc
-ros/src/Node.cc
+add_executable(${PROJECT_NAME}_mono_ar
+ros/src/ros_mono_ar.cc
 )
-add_dependencies (${PROJECT_NAME}_mono ${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
 
-target_link_libraries(${PROJECT_NAME}_mono
+target_link_libraries(${PROJECT_NAME}_mono_ar
 ${LIBS_ROS}
 )
 
-add_executable (${PROJECT_NAME}_stereo
-ros/src/StereoNode.cc
-ros/src/Node.cc
-)
-add_dependencies (${PROJECT_NAME}_stereo ${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
-
-target_link_libraries(${PROJECT_NAME}_stereo
-${LIBS_ROS}
-)
-
-add_executable (${PROJECT_NAME}_rgbd
-ros/src/RGBDNode.cc
-ros/src/Node.cc
-)
-add_dependencies (${PROJECT_NAME}_rgbd ${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
-
-target_link_libraries(${PROJECT_NAME}_rgbd
-${LIBS_ROS}
-)
-
-install(TARGETS ${PROJECT_NAME}_mono ${PROJECT_NAME}_stereo ${PROJECT_NAME}_rgbd
+install(TARGETS ${PROJECT_NAME}_mono_ar
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+#add_executable (${PROJECT_NAME}_mono
+#ros/src/MonoNode.cc
+#ros/src/Node.cc
+#)
+#add_dependencies (${PROJECT_NAME}_mono ${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
+
+#target_link_libraries(${PROJECT_NAME}_mono
+#${LIBS_ROS}
+#)
+
+#add_executable (${PROJECT_NAME}_stereo
+#ros/src/StereoNode.cc
+#ros/src/Node.cc
+#)
+#add_dependencies (${PROJECT_NAME}_stereo ${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
+
+#target_link_libraries(${PROJECT_NAME}_stereo
+#${LIBS_ROS}
+#)
+
+#add_executable (${PROJECT_NAME}_rgbd
+#ros/src/RGBDNode.cc
+#ros/src/Node.cc
+#)
+#add_dependencies (${PROJECT_NAME}_rgbd ${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
+
+#target_link_libraries(${PROJECT_NAME}_rgbd
+#${LIBS_ROS}
+#)
+
+#install(TARGETS ${PROJECT_NAME}_mono ${PROJECT_NAME}_stereo ${PROJECT_NAME}_rgbd
+#  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#)
 
 install(TARGETS ${PROJECT_NAME} DBoW2 g2o
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

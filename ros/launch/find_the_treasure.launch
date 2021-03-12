@@ -1,0 +1,6 @@
+<launch>
+    <!-- <include file="$(find video_stream_opencv)/launch/webcam.launch" /> -->
+    <include file="$(find tello_driver)/launch/tello_node.launch" />
+    <node pkg="orb_slam2_ros" name="find_the_treasure" type="orb_slam2_ros_mono_ar">
+    </node>
+</launch>

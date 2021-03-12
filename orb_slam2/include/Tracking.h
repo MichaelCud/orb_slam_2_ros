@@ -29,7 +29,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
 
-
+#include"Viewer.h"
 #include"FrameDrawer.h"
 #include"Map.h"
 #include"LocalMapping.h"
@@ -39,6 +39,7 @@
 #include"KeyFrameDatabase.h"
 #include"ORBextractor.h"
 #include "Initializer.h"
+#include "MapDrawer.h"
 #include "System.h"
 
 #include <mutex>
@@ -46,6 +47,7 @@
 namespace ORB_SLAM2
 {
 
+class Viewer;
 class FrameDrawer;
 class Map;
 class LocalMapping;
@@ -60,13 +62,23 @@ struct ORBParameters{
     // camera parameters
     float fx, fy, cx, cy, baseline;
     float k1, k2, p1, p2, k3;
+    // viewer parameters
+    float mKeyFrameSize;
+    float mKeyFrameLineWidth;
+    float mGraphLineWidth;
+    float mPointSize;
+    float mCameraSize;
+    float mCameraLineWidth;
+
+    float mImageWidth, mImageHeight;
+    float mViewpointX, mViewpointY, mViewpointZ, mViewpointF;   
 };
 
 class Tracking
 {
 
 public:
-    Tracking(System* pSys, ORBVocabulary* pVoc, FrameDrawer* pFrameDrawer, Map* pMap,
+    Tracking(System* pSys, ORBVocabulary* pVoc, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Map* pMap,
              KeyFrameDatabase* pKFDB, const int sensor, ORBParameters& parameters);
 
     // Preprocess the input and call Track(). Extract features and performs stereo matching.
@@ -77,6 +89,7 @@ public:
     void SetLocalMapper(LocalMapping* pLocalMapper);
     void SetLoopClosing(LoopClosing* pLoopClosing);
     void SetMinimumKeyFrames (int min_num_kf) {mnMinimumKeyFrames = min_num_kf;}
+    void SetViewer(Viewer* pViewer);
 
     // Load new settings
     // The focal lenght should be similar or scale prediction will fail when projecting points
@@ -189,7 +202,9 @@ protected:
     System* mpSystem;
 
     //Drawers
+    Viewer* mpViewer;
     FrameDrawer* mpFrameDrawer;
+    MapDrawer* mpMapDrawer;
 
     //Map
     Map* mpMap;
