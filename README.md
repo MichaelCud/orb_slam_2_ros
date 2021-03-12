@@ -59,7 +59,7 @@ A C++11 compiler is needed.
 ## Getting the code
 Clone the repository into your catkin workspace:
 ```
-git clone https://github.com/appliedAI-Initiative/orb_slam_2_ros.git
+git clone https://github.com/MichaelCud/orb_slam_2_ros.git
 ```
 
 ## ROS
